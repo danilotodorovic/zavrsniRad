@@ -1,0 +1,625 @@
+{
+	"info": {
+		"_postman_id": "842a4163-f6e3-445a-b133-c2e97f2f8a93",
+		"name": "GradebookDanilo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"//Provera response time-a",
+							"pm.test(\"Response time is less than 400ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);",
+							"});",
+							"",
+							"//Izvlacenje podataka iz env",
+							"",
+							"var firstName = pm.environment.get(\"firstName\");",
+							"var lastName = pm.environment.get(\"lastName\");",
+							"var email = pm.environment.get(\"email\");",
+							"var termsConditions = pm.environment.get(\"termsConditions\");",
+							"",
+							"//Provera da li su jednaki sa podacima iz responsa",
+							"",
+							"pm.test(\"Check response data\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.user.first_name).to.eql(firstName);",
+							"    pm.expect(jsonData.user.last_name).to.eql(lastName);",
+							"    pm.expect(jsonData.user.email).to.eql(email);",
+							"    pm.expect(jsonData.user.terms_conditions).to.eql(termsConditions);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"{{firstName}}\",\n    \"last_name\": \"{{lastName}}\",\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\",\n    \"password_confirmation\": \"{{password}}\",\n    \"terms_conditions\": \"{{termsConditions}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//Dodeljivanje vrednosti tokena promenljivoj \"token\"",
+							"//Setovanje tokena u environment",
+							"",
+							"pm.test(\"Find and set token in environment\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    var token = jsonData.token;",
+							"    pm.environment.set(\"token\", token);",
+							"});",
+							"",
+							"//Provera da li je token jednak u responsu i env",
+							"",
+							"var tokenEnv = pm.environment.get(\"token\");",
+							"",
+							"pm.test(\"Check token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.eql(tokenEnv);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add professor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"{{imeProfesora}}\",\n    \"last_name\": \"{{prezimeProfesora}}\",\n    \"imageUrl\": [\n        \"https://tinypng.com/images/social/website.jpg\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/professors/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"professors",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get professors",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//Setovanje id-a profesora u env",
+							"var imeProfesora = pm.environment.get(\"imeProfesora\");",
+							"var prezimeProfesora = pm.environment.get(\"prezimeProfesora\");",
+							" ",
+							"var jsonData = pm.response.json();",
+							"var niz = [];",
+							"for(let i = 0; i < jsonData.length; i++){",
+							"    if(jsonData[i].first_name === imeProfesora && jsonData[i].last_name === prezimeProfesora){",
+							"        niz.push(jsonData[i]);",
+							"    }",
+							"}",
+							"console.log(niz);",
+							"var idProfesora = niz[niz.length-1].id;",
+							"",
+							"pm.environment.set(\"idProfesora\", idProfesora);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/professors",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"professors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add gradebook",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"//Izvlacenje podataka iz env",
+							"",
+							"var idProfesora = pm.environment.get(\"idProfesora\");",
+							"var gradebookName = pm.environment.get(\"gradebookName\");",
+							"",
+							"//Provera da li su jednaki sa podacima iz responsa",
+							"",
+							"pm.test(\"Check response data\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.name).to.eql(gradebookName);",
+							"    pm.expect(jsonData.professor_id).to.eql(idProfesora);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"professor_id\": {{idProfesora}},\n    \"name\": \"{{gradebookName}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/gradebooks/store",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"gradebooks",
+						"store"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": " get gradebooks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/gradebooks",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"gradebooks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add gradebook without professor id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"{{gradebookName}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/gradebooks/store",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"gradebooks",
+						"store"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add gradebook without name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"professor_id\": {{idProfesora}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/gradebooks/store",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"gradebooks",
+						"store"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add gradebook name exceeding max",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var exceedingMax = \"\";",
+							"for (let i = 0; i < 256; i++){",
+							"    exceedingMax+= \"r\";",
+							"}",
+							"console.log(exceedingMax.length);",
+							"",
+							"pm.environment.set(\"exceedingMax\", exceedingMax);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"professor_id\": {{idProfesora}},\n    \"name\": \"{{exceedingMax}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/gradebooks/store",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"gradebooks",
+						"store"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add gradebook name subceeding min",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"professor_id\": {{idProfesora}},\n    \"name\": \"r\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/gradebooks/store",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"gradebooks",
+						"store"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add gradebook without authorisation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"professor_id\": {{idProfesora}},\n    \"name\": \"{{gradebookName}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/gradebooks/store",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"gradebooks",
+						"store"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add gradebook with professor who already has his class",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"professor_id\": {{idProfesora}},\n    \"name\": \"{{gradebookName}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/gradebooks/store",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"gradebooks",
+						"store"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

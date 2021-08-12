@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "842a4163-f6e3-445a-b133-c2e97f2f8a93",
+		"_postman_id": "12596fcb-70d2-4f40-b2a5-bd4c53407510",
 		"name": "GradebookDanilo",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -390,6 +390,57 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"professor_id\": {{idProfesora}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/gradebooks/store",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"gradebooks",
+						"store"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add gradebook without credentials",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Provera status code-a",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n}",
 					"options": {
 						"raw": {
 							"language": "json"
